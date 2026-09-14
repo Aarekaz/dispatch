@@ -1,0 +1,27 @@
+.next
+node_modules
+.env
+.env.local
+.env.production
+dist
+coverage
+*.log
+.gstack/
+.superpowers/
+claude_code_source/
+tsconfig.tsbuildinfo
+.vercel
+.env*.local
+.DS_Store
+
+# Other agent harnesses' skill installs (Convex skills under .agents/ stay tracked)
+.factory/
+.pi/
+.windsurf/
+.claude/skills/
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+.claude/worktrees/
+skills/
+.playwright-cli/
+output/

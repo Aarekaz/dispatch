@@ -1,0 +1,624 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "tw-shimmer";
+@import "../components/agent-elements/agent-ui.css";
+
+/* Shiki tokens via @streamdown/code: spans carry --sdm-c (light) and
+   --shiki-dark inline; Tailwind doesn't see the arbitrary classes
+   inside node_modules, so apply the colors here. */
+[data-streamdown="code-block"] span[style*="--sdm-c"] {
+  color: var(--sdm-c, inherit);
+}
+.dark [data-streamdown="code-block"] span[style*="--sdm-c"] {
+  color: var(--shiki-dark, var(--sdm-c, inherit));
+}
+
+/* In the file-view side panel the outer header already names the file,
+   so drop streamdown's nested chrome and let the highlighted code own
+   the surface. */
+.file-view-code [data-streamdown="code-block"] {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+.file-view-code [data-streamdown="code-block-header"],
+.file-view-code [data-streamdown="code-block-actions"] {
+  display: none;
+}
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* ── Typography ─────────────────────────── */
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-heading: var(--font-heading);
+  --font-serif: var(--font-newsreader), Georgia, serif;
+
+  /* ── Semantic colors (coss tokens) ──────── */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Status */
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
+  /* Charts */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Code blocks */
+  --color-code: var(--code);
+  --color-code-foreground: var(--code-foreground);
+  --color-code-highlight: var(--code-highlight);
+
+  /* Sidebar */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* ── Radius ─────────────────────────────── */
+  --radius: 0.625rem;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+  --radius-full: 9999px;
+
+  /* ── Custom shadows (used by cards/inputs in views/composer) ── */
+  --shadow-card:
+    0 0 0 1px rgba(0, 0, 0, 0.04),
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 3px 8px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover:
+    0 0 0 1px rgba(0, 0, 0, 0.06),
+    0 3px 10px rgba(0, 0, 0, 0.08),
+    0 6px 20px rgba(0, 0, 0, 0.05);
+  --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-input: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-input-focus: 0 0 0 2px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-elevated: 0 4px 24px -4px rgba(0, 0, 0, 0.10), 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  /* ── Animations (coss toast/skeleton/caret) ── */
+  --animate-caret-blink: 1s ease-out infinite caret-blink;
+  --animate-toast-success-odd: toast-success-odd 0.32s cubic-bezier(0.5, 1, 0.89, 1);
+  --animate-toast-success-even: toast-success-even 0.32s cubic-bezier(0.5, 1, 0.89, 1);
+  --animate-toast-error-odd: toast-error-odd 0.28s cubic-bezier(0.5, 1, 0.89, 1);
+  --animate-toast-error-even: toast-error-even 0.28s cubic-bezier(0.5, 1, 0.89, 1);
+  --animate-skeleton: skeleton 2s -1s infinite linear;
+
+  @keyframes caret-blink {
+    0%, 70%, to { opacity: 1; }
+    20%, 50% { opacity: 0; }
+  }
+  @keyframes toast-success-odd {
+    0% { scale: 1; }
+    30% { scale: 1.025; }
+    60% { scale: 0.99; }
+    100% { scale: 1; }
+  }
+  @keyframes toast-success-even {
+    0% { scale: 1; }
+    30% { scale: 1.025; }
+    60% { scale: 0.99; }
+    100% { scale: 1; }
+  }
+  @keyframes toast-error-odd {
+    0% { translate: 0 0; }
+    25% { translate: -3px 0; }
+    50% { translate: 3px 0; }
+    75% { translate: -3px 0; }
+    100% { translate: 0 0; }
+  }
+  @keyframes toast-error-even {
+    0% { translate: 0 0; }
+    25% { translate: -3px 0; }
+    50% { translate: 3px 0; }
+    75% { translate: -3px 0; }
+    100% { translate: 0 0; }
+  }
+  @keyframes skeleton {
+    to { background-position: -200% 0; }
+  }
+}
+
+/* ── Coss color tokens (single source of truth) ────────────── */
+
+:root {
+  --background: var(--color-white);
+  --foreground: var(--color-neutral-800);
+  --card: var(--color-white);
+  --card-foreground: var(--color-neutral-800);
+  --popover: var(--color-white);
+  --popover-foreground: var(--color-neutral-800);
+  --primary: var(--color-neutral-800);
+  --primary-foreground: var(--color-neutral-50);
+  --secondary: --alpha(var(--color-black) / 4%);
+  --secondary-foreground: var(--color-neutral-800);
+  --muted: --alpha(var(--color-black) / 4%);
+  --muted-foreground: color-mix(in srgb, var(--color-neutral-500) 90%, var(--color-black));
+  --accent: --alpha(var(--color-black) / 4%);
+  --accent-foreground: var(--color-neutral-800);
+  --destructive: var(--color-red-500);
+  --destructive-foreground: var(--color-red-700);
+  --border: --alpha(var(--color-black) / 8%);
+  --input: --alpha(var(--color-black) / 10%);
+  --ring: var(--color-neutral-400);
+
+  --success: var(--color-emerald-500);
+  --success-foreground: var(--color-emerald-700);
+  --warning: var(--color-amber-500);
+  --warning-foreground: var(--color-amber-700);
+  --info: var(--color-blue-500);
+  --info-foreground: var(--color-blue-700);
+
+  --chart-1: var(--color-orange-600);
+  --chart-2: var(--color-teal-600);
+  --chart-3: var(--color-cyan-900);
+  --chart-4: var(--color-amber-400);
+  --chart-5: var(--color-amber-500);
+
+  --code: var(--color-white);
+  --code-foreground: var(--foreground);
+  --code-highlight: --alpha(var(--color-black) / 4%);
+
+  --sidebar: var(--color-neutral-50);
+  --sidebar-foreground: color-mix(in srgb, var(--color-neutral-800) 64%, var(--sidebar));
+  --sidebar-primary: var(--color-neutral-800);
+  --sidebar-primary-foreground: var(--color-neutral-50);
+  --sidebar-accent: --alpha(var(--color-black) / 4%);
+  --sidebar-accent-foreground: var(--color-neutral-800);
+  --sidebar-border: --alpha(var(--color-black) / 6%);
+  --sidebar-ring: var(--color-neutral-400);
+}
+
+.dark {
+  --background: color-mix(in srgb, var(--color-neutral-950) 95%, var(--color-white));
+  --foreground: var(--color-neutral-100);
+  --card: color-mix(in srgb, var(--background) 98%, var(--color-white));
+  --card-foreground: var(--color-neutral-100);
+  --popover: color-mix(in srgb, var(--background) 98%, var(--color-white));
+  --popover-foreground: var(--color-neutral-100);
+  --primary: var(--color-neutral-100);
+  --primary-foreground: var(--color-neutral-800);
+  --secondary: --alpha(var(--color-white) / 4%);
+  --secondary-foreground: var(--color-neutral-100);
+  --muted: --alpha(var(--color-white) / 4%);
+  --muted-foreground: color-mix(in srgb, var(--color-neutral-500) 90%, var(--color-white));
+  --accent: --alpha(var(--color-white) / 4%);
+  --accent-foreground: var(--color-neutral-100);
+  --destructive: color-mix(in srgb, var(--color-red-500) 90%, var(--color-white));
+  --destructive-foreground: var(--color-red-400);
+  --border: --alpha(var(--color-white) / 6%);
+  --input: --alpha(var(--color-white) / 8%);
+  --ring: var(--color-neutral-500);
+
+  --success: var(--color-emerald-500);
+  --success-foreground: var(--color-emerald-400);
+  --warning: var(--color-amber-500);
+  --warning-foreground: var(--color-amber-400);
+  --info: var(--color-blue-500);
+  --info-foreground: var(--color-blue-400);
+
+  --chart-1: var(--color-blue-700);
+  --chart-2: var(--color-emerald-500);
+  --chart-3: var(--color-amber-500);
+  --chart-4: var(--color-purple-500);
+  --chart-5: var(--color-rose-500);
+
+  --code: color-mix(in srgb, var(--background) 98%, var(--color-white));
+  --code-foreground: var(--foreground);
+  --code-highlight: --alpha(var(--color-white) / 4%);
+
+  --sidebar: color-mix(in srgb, var(--color-neutral-950) 97%, var(--color-white));
+  --sidebar-foreground: color-mix(in srgb, var(--color-neutral-100) 64%, var(--sidebar));
+  --sidebar-primary: var(--color-neutral-100);
+  --sidebar-primary-foreground: var(--color-neutral-800);
+  --sidebar-accent: --alpha(var(--color-white) / 4%);
+  --sidebar-accent-foreground: var(--color-neutral-100);
+  --sidebar-border: --alpha(var(--color-white) / 5%);
+  --sidebar-ring: var(--color-neutral-400);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    min-height: 100dvh;
+    font-feature-settings: "cv01", "cv02", "cv11";
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    text-rendering: optimizeLegibility;
+    letter-spacing: -0.01em;
+  }
+
+  code, kbd, samp, pre {
+    font-family: var(--font-mono);
+  }
+}
+
+/* ── Scrollbar ────────────────────────────── */
+
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: --alpha(var(--color-black) / 24%) transparent;
+  }
+  .dark * {
+    scrollbar-color: --alpha(var(--color-white) / 24%) transparent;
+  }
+
+  /* WebKit fallback (Safari ignores scrollbar-width). */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: --alpha(var(--color-black) / 18%);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: --alpha(var(--color-black) / 28%);
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: --alpha(var(--color-white) / 18%);
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: --alpha(var(--color-white) / 28%);
+  }
+}
+
+/* ── Custom utilities (Tailwind v4 @utility) ── */
+
+@utility focus-ring {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-background), 0 0 0 4px --alpha(var(--color-ring) / 15%);
+}
+
+@utility glow-active {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 0 8px rgba(0, 0, 0, 0.03);
+}
+
+@utility press-scale {
+  transition-property: transform;
+  transition-duration: 100ms;
+  &:active {
+    transform: scale(0.96);
+  }
+}
+
+@utility hover-lift {
+  transition-property: box-shadow;
+  transition-duration: 150ms;
+  &:hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+}
+
+@utility contextual-action {
+  opacity: 0;
+  transition-property: opacity;
+  transition-duration: 150ms;
+  &:is(:where(.group):hover *) {
+    opacity: 1;
+  }
+}
+
+/* ── Transition defaults ──────────────────── */
+
+@layer base {
+  button, a, [role="button"] {
+    transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  /* No press-bounce on buttons/anchors anywhere in the app — bouncing
+     list rows, sidebar items, and inline tool buttons reads as buggy.
+     `!important` neutralizes Tailwind `active:scale-*` utilities sprinkled
+     through agent-elements without having to chase each one. UI primitives
+     that rely on `:active` (switch thumbs, etc.) target `[role=switch]`
+     or `[data-slot=...]`, not bare button/anchor, so they're unaffected. */
+  button:active,
+  a:active,
+  [role="button"]:active {
+    transform: none !important;
+  }
+}
+
+/* ── Blob avatar animations ─────────────── */
+
+@keyframes siriBlob1 {
+  0%   { transform: translate(-25%, -20%) scale(1); }
+  33%  { transform: translate(15%, -25%) scale(1.15); }
+  66%  { transform: translate(25%, 15%) scale(0.9); }
+  100% { transform: translate(-10%, 20%) scale(1.1); }
+}
+
+@keyframes siriBlob2 {
+  0%   { transform: translate(25%, -15%) scale(1.1); }
+  33%  { transform: translate(-20%, 20%) scale(0.85); }
+  66%  { transform: translate(-15%, -25%) scale(1.15); }
+  100% { transform: translate(20%, 10%) scale(1); }
+}
+
+@keyframes siriBlob3 {
+  0%   { transform: translate(10%, 25%) scale(0.9); }
+  33%  { transform: translate(20%, -20%) scale(1.15); }
+  66%  { transform: translate(-25%, 10%) scale(1); }
+  100% { transform: translate(-15%, -15%) scale(1.1); }
+}
+
+@keyframes siriBlob4 {
+  0%   { transform: translate(-15%, 10%) scale(1.15); }
+  33%  { transform: translate(25%, 15%) scale(0.9); }
+  66%  { transform: translate(-10%, -20%) scale(1.1); }
+  100% { transform: translate(15%, 25%) scale(1); }
+}
+
+@keyframes siriPulse {
+  0%   { opacity: 0.4; transform: scale(0.7); }
+  50%  { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 0.4; transform: scale(0.7); }
+}
+
+@keyframes greetingEnter {
+  from { opacity: 0; transform: translateY(8px); filter: blur(4px); }
+  to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+/* ── Empty-state ghost carousel ─────────────
+ *
+ * Masked horizontal marquee. The inner track renders the template
+ * list *twice* and translates from 0 to -50% over a long duration,
+ * which puts the midpoint of the animation at the exact start of the
+ * second copy — so the loop is seamless.
+ *
+ * A `mask-image` linear gradient on the viewport fades the left and
+ * right edges to transparent, creating a "focus zone" in the center
+ * of the container. Whichever card happens to be under that clear
+ * middle is crisp; cards near the edges fade out softly.
+ *
+ * This approach is fully data-driven: adding a new template to
+ * GHOST_AGENTS in home-view.tsx just appears in the scroll without
+ * any CSS changes. The duration below is tuned for ~3 cards visible
+ * on a typical desktop viewport — a single card takes roughly 6-8
+ * seconds to drift from edge to edge through the focus zone.
+ *
+ * GPU-accelerated: only `transform` animates. No layout, no paint.
+ */
+@keyframes ghostMarquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes siriBlob1 { 0%, 100% { transform: none; } }
+  @keyframes siriBlob2 { 0%, 100% { transform: none; } }
+  @keyframes siriBlob3 { 0%, 100% { transform: none; } }
+  @keyframes siriBlob4 { 0%, 100% { transform: none; } }
+  @keyframes siriPulse { 0%, 100% { opacity: 0.7; transform: scale(1); } }
+  @keyframes greetingEnter { 0%, 100% { opacity: 1; transform: none; filter: none; } }
+  /* Reduced motion: no marquee translation. Cards render statically. */
+  @keyframes ghostMarquee { 0%, 100% { transform: none; } }
+}
+
+/* ── Greeting utilities ─────────────────── */
+
+@utility dot-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  background-image: radial-gradient(circle, currentColor 1px, transparent 1px);
+  background-size: 16px 16px;
+  mask-image: linear-gradient(to bottom, black 30%, transparent 75%);
+  -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 75%);
+  pointer-events: none;
+}
+
+@utility greeting-enter {
+  animation: greetingEnter 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* ── Ghost marquee viewport ────────────────
+ *
+ * The outer container for the empty-state template carousel.
+ * Applies the center-focus gradient mask and pauses the inner track
+ * whenever the user is interacting (hover OR keyboard focus).
+ *
+ * **Display gate:** the marquee is hidden by default and only shown
+ * on sm+ viewports that ALSO support hover (`@media (hover: hover)`).
+ * This is a WCAG 2.2.2 ("Pause, Stop, Hide") compliance fix — the
+ * animation auto-advances for >5s and its only pause trigger is
+ * `:hover` / `:focus-within`. Touch-only devices (phones, tablets
+ * without trackpads) have no way to activate either trigger, so we
+ * hide the marquee entirely on those devices. The static
+ * single-card fallback (`ghost-marquee-static-fallback` utility
+ * below) takes over whenever this container is hidden.
+ *
+ * iPads with Magic Keyboard / trackpads correctly report
+ * `hover: hover` and get the marquee. iPhones and bare iPads report
+ * `hover: none` and get the static card.
+ *
+ * `overflow-hidden` is applied on the element in the component
+ * (redundant with the mask but belt-and-suspenders for browsers
+ * that render masks lazily).
+ */
+@utility ghost-marquee-viewport {
+  display: none;
+  /* `contain: layout paint` scopes the marquee's layout + paint
+   * invalidation to itself — the browser knows nothing inside the
+   * carousel can affect the rest of the page, so the 48s continuous
+   * transform animation can be handled on an isolated compositor
+   * layer without triggering re-layout or re-paint of the surrounding
+   * home view. Combined with `overflow: hidden` (applied on the
+   * element) and `will-change: transform` on the inner track, this
+   * keeps the marquee animation off the main render pipeline.
+   *
+   * `contain: layout paint` (rather than the stricter `strict`) is
+   * chosen deliberately: we need `size` containment OFF so the mask
+   * gradient can measure the container's intrinsic width, and
+   * `style` containment is irrelevant because we don't use CSS
+   * counters inside. */
+  contain: layout paint;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 15%,
+    black 85%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 15%,
+    black 85%,
+    transparent 100%
+  );
+
+  @media (min-width: 640px) and (hover: hover) {
+    display: block;
+  }
+
+  /* Reduced motion: hide the marquee entirely. The static fallback
+   * (mirrored override below) takes over even on desktop with hover
+   * support. Source order matters — this rule must come AFTER the
+   * `(hover: hover)` gate above so the reduced-motion override wins
+   * the cascade for desktop+reduced-motion users. */
+  @media (prefers-reduced-motion: reduce) {
+    display: none;
+  }
+
+  &:hover .ghost-marquee-track,
+  &:focus-within .ghost-marquee-track {
+    animation-play-state: paused;
+  }
+
+  /* Keyboard focus accessibility: when any descendant card is
+   * keyboard-focused (`:focus-visible` only fires for keyboard, not
+   * mouse), drop the mask entirely so the focused card reads clearly
+   * regardless of where it sits relative to the fade gradient. The
+   * `:focus-within` rule above already pauses the track on the same
+   * trigger, so the focused card holds still AND becomes fully
+   * legible. Mouse users still see the normal masked behavior. */
+  &:has(.ghost-marquee-card:focus-visible) {
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+}
+
+/* ── Ghost marquee static fallback ─────────
+ *
+ * The inverse of `ghost-marquee-viewport`'s display gate. Shown
+ * whenever the marquee is hidden — i.e., on narrow viewports OR on
+ * touch-only devices that can't pause the marquee. Renders a single
+ * representative template card statically.
+ *
+ * Using a CSS utility for the toggle (instead of Tailwind's
+ * `sm:hidden` / `sm:block` classes) because the condition depends on
+ * BOTH viewport width AND hover capability — compound media queries
+ * are cleaner in a single CSS rule than in utility-class stacking.
+ */
+@utility ghost-marquee-static-fallback {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+
+  @media (min-width: 640px) and (hover: hover) {
+    display: none;
+  }
+
+  /* Reduced motion: re-show the static card even on desktop with
+   * hover, mirroring the override on `.ghost-marquee-viewport` above.
+   * Source order ensures this rule wins over the `(hover: hover)`
+   * `display: none` for users who have `prefers-reduced-motion: reduce`
+   * AND a desktop. */
+  @media (prefers-reduced-motion: reduce) {
+    display: flex;
+  }
+}
+
+/* ── Ghost marquee track ───────────────────
+ *
+ * The inner flex track that translates. Must contain two copies of
+ * the card list back-to-back so that translating by -50% of its own
+ * width lands on an identical frame and the loop is invisible.
+ *
+ * Duration is long enough that the drift reads as "slow and
+ * confident" — a single card takes ~6-8 seconds to cross the visible
+ * focus zone on a typical desktop. Linear timing (not eased) because
+ * a constant-velocity marquee looks uniform; any ease curve would
+ * create a visible "pulse" as the loop seams.
+ */
+@utility ghost-marquee-track {
+  animation: ghostMarquee 48s linear infinite;
+  will-change: transform;
+}
+
+/* ── Ghost marquee card hover ──────────────
+ *
+ * Individual card hover micro-interaction for the empty-state
+ * marquee. Subtle lift + shadow bump, fast snap using ease-out-quart.
+ * No glow, no scale, no color shift — just an intentional lift that
+ * acknowledges the pointer without stealing attention from whatever
+ * card is currently in the mask's focus zone.
+ */
+@utility ghost-marquee-card {
+  transition: transform 180ms cubic-bezier(0.25, 1, 0.5, 1),
+              box-shadow 180ms cubic-bezier(0.25, 1, 0.5, 1),
+              border-color 180ms cubic-bezier(0.25, 1, 0.5, 1);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card-hover);
+    border-color: oklch(var(--foreground) / 0.18);
+  }
+}
